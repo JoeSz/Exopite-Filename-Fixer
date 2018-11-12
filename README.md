@@ -13,7 +13,7 @@ Sanitize file name on upload. Handle umlauts and fill meta for images from file 
 INSTALLATION
 ------------
 
-1. [x] Upload `exopite-seo-core` to the `/wp-content/plugins/exopite-seo-core/` directory
+1. [x] Upload `exopite-filename-fixer` to the `/wp-content/plugins/` directory
 
 OR
 
