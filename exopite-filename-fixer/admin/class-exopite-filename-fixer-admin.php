@@ -121,8 +121,10 @@ class Exopite_Filename_Fixer_Admin {
             $my_image_title = get_post( $post_ID )->post_title;
 
             // https://stackoverflow.com/questions/5546120/php-capitalize-after-dash/5546534#5546534
-            $my_image_title = implode( '--', array_map( 'ucfirst', explode( '--', $my_image_title ) ) );
-            $my_image_title = str_replace( '--', '-', $my_image_title );
+            $my_image_title = implode( '-', array_map( 'ucfirst', explode( '--', $my_image_title ) ) );
+
+			// Remove multiple -
+			$my_image_title = preg_replace( '/-+/', '-', $my_image_title );
 
             // Sanitize the title:  remove hyphens, underscores & extra spaces:
             $my_image_title = preg_replace( '%\s*[-_\s]+\s*%', ' ',  $my_image_title );
@@ -170,12 +172,12 @@ class Exopite_Filename_Fixer_Admin {
 			//extension = Extension
 			//filename  = Filename
 
-		/**
-		 * Fix sanitize german umlauts.
-		 *
-		 * @link https://github.com/salcode/fe-sanitize-title-js/issues/1
-		 */
-		$filename = $this->replace_umlauts( $filename );
+        /**
+         * Remove special chars, sanitize_title does not this (or at least not all).
+         * Replace "speacial" chars without remove accents.
+         */
+        $filename = $this->special_replace_chars( $filename );
+        $filename = remove_accents( $filename );
 
 		// Create new attachment name
 		$filename_new = sanitize_title( $filename_new_pre );
@@ -215,12 +217,12 @@ class Exopite_Filename_Fixer_Admin {
 			$filename = substr( $filename, 0, strlen( $filename )-strlen( $ext ) );
 		}
 
-		/**
-		 * Fix sanitize german umlauts.
-		 *
-		 * @link https://github.com/salcode/fe-sanitize-title-js/issues/1
-		 */
-		$filename = $this->replace_umlauts( $filename );
+        /**
+         * Remove special chars, sanitize_title does not this (or at least not all).
+         * Replace "speacial" chars without remove accents.
+         */
+        $filename = $this->special_replace_chars( $filename );
+        $filename = remove_accents( $filename );
 
 		/**
 		 * Sanitize filename.
@@ -239,18 +241,33 @@ class Exopite_Filename_Fixer_Admin {
 	}
 
 	/**
-	 * Fix sanitize german umlauts.
+	 * Fix and sanitize some special cases.
 	 *
 	 * @link https://github.com/salcode/fe-sanitize-title-js/issues/1
 	 */
-	public function replace_umlauts( $string  ) {
+	public function special_replace_chars( $string  ) {
 
-		$search  = [ 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß' ];
-		$replace = [ 'ae', 'ae', 'oe', 'oe', 'ue', 'ue', 'ss' ];
-		return str_replace( $search, $replace , $string );
+        $replace = array(
+            'Ä' => 'ae',
+            'ä' => 'ae',
+            'Ö' => 'oe',
+            'ö' => 'oe',
+            'Ü' => 'ue',
+            'ü' => 'ue',
+            'ß' => 'ss',
+            '€' => 'euro',
+            '@' => 'at',
+            '%20' => '-',
+            '©' => 'copy',
+            '&amp;' => 'and',
+            '℠' => 'sm',
+            '™' => 'tm',
+            '№' => 'No',
+        );
 
-	}
+        return strtr( $string, $replace );
 
+    }
 	public function sanitize_file_name( $filename_sanitized, $filename_raw ) {
 
 		// Get file parts.
@@ -258,12 +275,12 @@ class Exopite_Filename_Fixer_Admin {
 		$ext = $pathinfo['extension'];
 		$filename = $pathinfo['filename'];
 
-		/**
-		 * Fix sanitize german umlauts.
-		 *
-		 * @link https://github.com/salcode/fe-sanitize-title-js/issues/1
-		 */
-		$filename = $this->replace_umlauts( $filename );
+        /**
+         * Remove special chars, sanitize_title does not this (or at least not all).
+         * Replace "speacial" chars without remove accents.
+         */
+        $filename = $this->special_replace_chars( $filename );
+        $filename = remove_accents( $filename );
 
 		/**
 		 * Sanitize filename.
