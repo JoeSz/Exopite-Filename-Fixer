@@ -129,7 +129,7 @@ class Exopite_Filename_Fixer_Admin {
             // Sanitize the title:  remove hyphens, underscores & extra spaces:
             $my_image_title = preg_replace( '%\s*[-_\s]+\s*%', ' ',  $my_image_title );
 
-            // Sanitize the title:  capitalize first letter of every word (other letters lower case):
+            // Sanitize the title:  capitalize first letter of the string (other letters lower case):
             $my_image_title = ucfirst( $my_image_title );
 
             // Create an array with the image meta (Title, Caption, Description) to be updated
